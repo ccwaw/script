@@ -1,38 +1,47 @@
-const { JSDOM } = require( "jsdom" );
-const { window } = new JSDOM( "" );
-const $ = require( "jquery" )( window );
+/*
+*
+* 首页 福利中心 查看更多  抓包 api.hellobike.com/api?urser 请求里面的 TOKEN
+*
+* 定时  0 8 * * *
+*
+* 环境变量格式 hlToken="123456789"
+*
+*/
 
+const axios = require('axios');
 
-const $$ = new Env('哈罗自动签到');
+const $ = new Env('哈罗自动签到');
 
 // 获取系统TOKEN
 
 const token = process.env.hlToken;
 
-const tsr = token.split("@");
+!(async()=>{
 
+    if(!token){
+        $.msg('请添加哈罗APPToken在运行此脚本');
+    };
+    let url = 'https://api.hellobike.com/api?common.welfare.signAndRecommend';
+    let data = '{"from":"h5","systemCode":62,"platform":4,"version":"6.46.0","action":"common.welfare.signAndRecommend","token":"'+token+'","pointType":1}';
+    await axios.post(url, data)
+      .then(function (data) {     
+          let succ = data['data']['data']['didSignToday'];
+          let reward = data['data']['data']['bountyCountToday'];
+          succ === true ?$.log('今日签到成功 金币+'+reward+''):$.log('今日未签到');
 
-const url='https://api.hellobike.com/api?common.welfare.signAndRecommend';
+  })
+  .catch(function (error) {
+    console.log('哈罗TOKEN已失效');
+  });
 
-for(var i = 0; i < tsr.length; i++ ){
-let data = '{"from":"h5","systemCode":62,"platform":4,"version":"6.46.0","action":"common.welfare.signAndRecommend","token":"'+tsr[i]+'"}';
-$.ajax({
-  type: 'POST',
-  url: url,
-  data: data,
-  success: function(data2,status){
-	  let check = data2['data']['didSignToday'];
-	  let jlj = data2['data']['bountyCountToday'];
-	  if(check == true ){
-		  console.log("今日已签到 金币加" +jlj)
-	  }
-	  
-  },
-  error:function(xhr){
-	  console.log(xhr)
-  },
-  dataType: 'json'
-});}
+})()
+.catch((e) => {
+    $.logErr(e);
+})
+.finally(() => {
+    $.done();
+});
+
 
 
 // prettier-ignore
