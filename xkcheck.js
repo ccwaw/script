@@ -1,5 +1,5 @@
 /**
- * cron: 0 0 * * *
+ * cron: 0 8 * * *
  *
  * 星空代理签到
  *
@@ -10,8 +10,8 @@ const $ = new Env('星空代理签到');
 
 !(async () => {
 
-    let uname       = '13152502669'; // 你的用户名
-    let pwd         = 'q17000133o'; // 你的密码
+    let uname       = ''; // 你的用户名
+    let pwd         = ''; // 你的密码
     let loginUrl    = 'http://www.xkdaili.com/tools/submit_ajax.ashx?action=user_login&site_id=1'; // 登录URL
     let data        = 'username='+uname+'&password='+pwd+'&remember=1';
     let headers     = {
