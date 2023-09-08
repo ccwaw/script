@@ -1,62 +1,60 @@
 /**
- * cron: 0 0 * * *
+ * cron: 0 1 * * * 每天凌晨1点执行
  *
  * 星空代理签到
  *
+ * 单账号环境变量 账户名@密码
+ * 多账户环境变量 以 # 号分割 示例 账户1@密码#账户2@密码
+ * 
  */
-
 const axios = require('axios');
-const $ = new Env('星空代理签到');
+const $     = new Env('星空代理签到');
+const accountList = process.env.xk;
 
 !(async () => {
+    if(accountList == null){
+        $.msg('\n 请添加系统环境 名称 xk 格式 账号@密码 多账号用#分隔 \n');
+        return;
+    }
+    const checkUrl = 'http://www.xkdaili.com/tools/submit_ajax.ashx?action=user_receive_point';
+    const loginUrl = 'http://www.xkdaili.com/tools/submit_ajax.ashx?action=user_login&site_id=1';
+    const lgheader = {'Host':'www.xkdaili.com','User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36','Origin':'http://www.xkdaili.com','Referer':'http://www.xkdaili.com/'};
+    const account =accountList.split('#');
+    for(var i = 0 ;i < account.length;i++){
+        $.wait(3000);
+        const acclist = /(.*)@(.*)/.exec(account[i]);
+        const accname = acclist[1];
+        const accpwd  = acclist[2];
+        const lgdata     = 'username='+accname+'&password='+accpwd+'&remember=1';
+        const getcookie = await http(loginUrl,lgdata,lgheader);
+        const setCookie = getcookie.headers['set-cookie'];
+        const ckuname =/(dt_cookie_user_name_remember.?DTcms.\d+;)/.exec(setCookie);
+        const ckpwd =/(dt_cookie_user_pwd_remember=DTcms=\S+;?)/.exec(setCookie);
+        if(ckpwd !== null){
+        const asp = /ASP.NET_SessionId=\S+/.exec(setCookie);
+        const cookie = ckuname[1]+ckpwd[0]+asp;
+        $.wait(2000);
+        const checkHed = {'Accept': 'application/json, text/javascript, */*; q=0.01','Accept-Encoding': 'gzip, deflate','Accept-Language': 'zh-CN,zh;q=0.9','Content-Length': '10','Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8','Cookie': cookie,'Host': 'www.xkdaili.com','Origin': 'http://www.xkdaili.com','Proxy-Connection': 'keep-alive','Referer': 'http://www.xkdaili.com/main/usercenter.aspx','User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36','X-Requested-With': 'XMLHttpRequest'};
+        const u_sgin = {'type': 'login'};
+        const res = await http(checkUrl,u_sgin,checkHed);
+        res.data.msg == '已领取！'? $.msg('\n 账号：'+accname+' ✔️ 今日已签到成功'):$.log('正在签到中... ing');
+}else{
+    $.log('------------------------------------------------');
+    $.log('\n 账号：'+accname+' ❌️ 登录失败，请检查账号密码！');
+}};
 
-    let uname       = ''; // 你的用户名
-    let pwd         = ''; // 你的密码
-    let loginUrl    = 'http://www.xkdaili.com/tools/submit_ajax.ashx?action=user_login&site_id=1'; // 登录URL
-    let data        = 'username='+uname+'&password='+pwd+'&remember=1';
-    let headers     = {
-                        'Host':'www.xkdaili.com',
-                        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
-                        'Origin':'http://www.xkdaili.com',
-                        'Referer':'http://www.xkdaili.com/'}; 
-    await axios.post(loginUrl,data,{headers:headers})
-        .then((data)=>{
-                    const setCookie = data.headers['set-cookie'];
-                    const ckuname =/(dt_cookie_user_name_remember.?DTcms.\d+;)/.exec(setCookie);
-                    const ckpwd =/(dt_cookie_user_pwd_remember=DTcms=\S+;?)/.exec(setCookie);
-                    const asp = /ASP.NET_SessionId=\S+/.exec(setCookie);
-                    cookie = ckuname[1]+ckpwd[0]+asp;
-                })
-
-    let u_sgin = {
-                    'type': 'login'
-            };
-
-    const header2 = {
-                    'Accept': 'application/json, text/javascript, */*; q=0.01',
-                    'Accept-Encoding': 'gzip, deflate',
-                    'Accept-Language': 'zh-CN,zh;q=0.9',
-                    'Content-Length': '10',
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                    'Cookie': cookie,
-                    'Host': 'www.xkdaili.com',
-                    'Origin': 'http://www.xkdaili.com',
-                    'Proxy-Connection': 'keep-alive',
-                    'Referer': 'http://www.xkdaili.com/main/usercenter.aspx',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
-                    'X-Requested-With': 'XMLHttpRequest'
-                };
-    await axios.post('http://www.xkdaili.com/tools/submit_ajax.ashx?action=user_receive_point',u_sgin,{headers:header2})
-            .then((data)=>{
-                data.data.msg == '已领取！'? $.msg('\n ✔️ 今日已签到成功'):$.log('正在签到中... ing');
+    function http(url,data,header){
+        return axios.post(url,data,{headers:header})
+            .then((result)=>{
+                return result;
             })
-
+    }
 })()
-    .catch((e) => {
-        $.logErr(e);
-    })
-    .finally(() => {
-        $.done();
+.catch((e) => {
+    $.logErr(e);
+})
+.finally(() => {
+    $.done();
 });
 
 // prettier-ignore
