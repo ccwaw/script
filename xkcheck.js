@@ -37,7 +37,7 @@ const accountList = process.env.xk;
         const checkHed = {'Accept': 'application/json, text/javascript, */*; q=0.01','Accept-Encoding': 'gzip, deflate','Accept-Language': 'zh-CN,zh;q=0.9','Content-Length': '10','Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8','Cookie': cookie,'Host': 'www.xkdaili.com','Origin': 'http://www.xkdaili.com','Proxy-Connection': 'keep-alive','Referer': 'http://www.xkdaili.com/main/usercenter.aspx','User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36','X-Requested-With': 'XMLHttpRequest'};
         const u_sgin = {'type': 'login'};
         const res = await http(checkUrl,u_sgin,checkHed);
-        res.data.msg == '已领取！'? $.msg('\n 账号：'+accname+' ✔️ 今日已签到成功'):$.log('正在签到中... ing');
+        res.data.msg == '已领取！'? $.msg('\n 账号：'+accname+' ✔️ 今日已签到成功'):$.log('\n 正在签到中..'+accname+'  ✔️ 签到成功');
 }else{
     $.log('------------------------------------------------');
     $.log('\n 账号：'+accname+' ❌️ 登录失败，请检查账号密码！');
