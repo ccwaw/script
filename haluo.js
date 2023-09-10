@@ -28,6 +28,11 @@ const token = process.env.hlToken;
           let succ = data['data']['data']['didSignToday'];
           let reward = data['data']['data']['bountyCountToday'];
           succ === true ?$.log('今日签到成功 金币+'+reward+''):$.log('今日未签到');
+          if(succ === true){
+            require('./sendNotify.js').sendNotify('哈罗自动签到','今日已签到成功 金币+'+reward+'',params = {},author = '\n\n本通知 By：https://github.com/ccwaw/script');
+          }else{
+            require('./sendNotify.js').sendNotify('哈罗自动签到','今日未签到，请检查TOKEN是否过期。',params = {},author = '\n\n本通知 By：https://github.com/ccwaw/script');
+          }
 
   })
   .catch(function (error) {

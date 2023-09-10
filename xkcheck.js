@@ -38,9 +38,12 @@ const accountList = process.env.xk;
         const u_sgin = {'type': 'login'};
         const res = await http(checkUrl,u_sgin,checkHed);
         res.data.msg == '已领取！'? $.msg('\n 账号：'+accname+' ✔️ 今日已签到成功'):$.log('\n 正在签到中..'+accname+'  ✔️ 签到成功');
+        require('./sendNotify.js').sendNotify('星空代理签到','账号：'+accname+' ✔️ 今日已签到成功',params = {},author = '\n\n本通知 By：https://github.com/ccwaw/script');
 }else{
     $.log('------------------------------------------------');
     $.log('\n 账号：'+accname+' ❌️ 登录失败，请检查账号密码！');
+    require('./sendNotify.js').sendNotify('星空代理签到','账号：'+accname+' ❌️ 登录失败，请检查账号密码！',params = {},author = '\n\n本通知 By：https://github.com/ccwaw/script');
+
 }};
 
     function http(url,data,header){
