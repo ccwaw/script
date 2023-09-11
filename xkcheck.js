@@ -1,9 +1,11 @@
 /**
+ *
  * cron: 0 1 * * * 每天凌晨1点执行
  * 星空代理签到
  * 单账号环境变量 账户名@密码
  * 多账户环境变量 以 # 号分割 示例 账户1@密码#账户2@密码
- */
+ * 
+*/
 const axios = require('axios');
 const $     = new Env('星空代理签到');
 const accountList = process.env.xk;
