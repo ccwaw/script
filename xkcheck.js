@@ -18,16 +18,17 @@ const sn = 0;
         $.msg('\n 请添加系统环境 名称 xk 格式 账号@密码 多账号用#分隔 \n');
         return;
     }
-    const checkUrl = 'http://www.xkdaili.com/tools/submit_ajax.ashx?action=user_receive_point';
-    const loginUrl = 'http://www.xkdaili.com/tools/submit_ajax.ashx?action=user_login&site_id=1';
-    const lgheader = { 'Host': 'www.xkdaili.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36', 'Origin': 'http://www.xkdaili.com', 'Referer': 'http://www.xkdaili.com/' };
+    
+    const checkUrl = 'https://www.xkdaili.com/tools/submit_ajax.ashx?action=user_receive_point';
+    const loginUrl = 'https://www.xkdaili.com/tools/submit_ajax.ashx?action=user_login&site_id=1';
+    const lgheader = { 'Host': 'www.xkdaili.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36', 'Origin': 'http://www.xkdaili.com', 'Referer': 'https://www.xkdaili.com/aspx/home.aspx' };
     const account = accountList.split('#');
     for (var i = 0; i < account.length; i++) {
         $.wait(3000);
         const acclist = /(.*)@(.*)/.exec(account[i]);
         const accname = acclist[1];
         const accpwd = acclist[2];
-        const lgdata = 'username=' + accname + '&password=' + accpwd + '&remember=1';
+        const lgdata = 'username=' + accname + '&password=' + accpwd + '&remember=1&code=';
         const getcookie = await http(loginUrl, lgdata, lgheader);
         const setCookie = getcookie.headers['set-cookie'];
         const ckuname = /(dt_cookie_user_name_remember.?DTcms.\d+;)/.exec(setCookie);
@@ -43,10 +44,11 @@ const sn = 0;
                 const asp = /ASP.NET_SessionId=\S+/.exec(setCookie);
                 const cookie = ckuname[1] + ckpwd[0] + asp;
                 $.wait(2000);
-                const checkHed = { 'Accept': 'application/json, text/javascript, */*; q=0.01', 'Accept-Encoding': 'gzip, deflate', 'Accept-Language': 'zh-CN,zh;q=0.9', 'Content-Length': '10', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'Cookie': cookie, 'Host': 'www.xkdaili.com', 'Origin': 'http://www.xkdaili.com', 'Proxy-Connection': 'keep-alive', 'Referer': 'http://www.xkdaili.com/main/usercenter.aspx', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36', 'X-Requested-With': 'XMLHttpRequest' };
+                const checkHed = { 'Accept': 'application/json, text/javascript, */*; q=0.01', 'Accept-Encoding': 'gzip, deflate', 'Accept-Language': 'zh-CN,zh;q=0.9', 'Content-Length': '10', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'Cookie': cookie, 'Host': 'www.xkdaili.com', 'Origin': 'https://www.xkdaili.com', 'Proxy-Connection': 'keep-alive', 'Referer': 'https://www.xkdaili.com/main/usercenter.aspx', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36', 'X-Requested-With': 'XMLHttpRequest' };
                 const u_sgin = { 'type': 'login' };
                 const res = await http(checkUrl, u_sgin, checkHed);
-                res.data.msg == '已领取！' ? $.msg('\n 账号：' + accname + ' ✔️ 今日已签到成功') : $.log('\n 正在签到中..' + accname + '  ✔️ 签到成功');
+                console.log(res.data);
+                res.data.status == 1 ? $.msg('\n 账号：' + accname + ' ✔️ 今日已签到成功') : $.log('\n 正在签到中..' + accname + '  ✔️ 签到成功');
                 sn == 1 ? send.sendNotify('星空代理签到', '账号：' + accname + ' ✔️ 今日已签到成功', params = {}, author = '\n\n本通知 By：https://github.com/ccwaw/script') : false;
                 break;
             }
